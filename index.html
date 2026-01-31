@@ -2,8 +2,8 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>品言的计划</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>品言计划</title>
     <style>
         * {
             box-sizing: border-box;
@@ -18,7 +18,6 @@
             z-index: 1;
             min-height: 100vh;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .background {
@@ -34,7 +33,7 @@
             transform: scale(1.01);
         }
 
-        /* 新增菜单样式 - 简约版本 */
+        /* 菜单样式 */
         .menu-container {
             position: fixed;
             top: 15px;
@@ -196,7 +195,7 @@
             padding: 10px;
         }
 
-        /* 响应式布局 */
+        /* 响应式布局 - 大屏幕为左右布局 */
         @media (min-width: 768px) {
             .container {
                 display: flex;
@@ -222,6 +221,7 @@
             }
         }
 
+        /* 响应式布局 - 小屏幕为上下布局 */
         @media (max-width: 767px) {
             .container {
                 flex-direction: column;
@@ -258,7 +258,7 @@
                 font-size: 12.5px;
             }
             
-            .change-bg-btn, .add-btn, .set-daily-btn {
+            .change-bg-btn, .add-btn, .set-daily-btn, .add-toggle-btn {
                 padding: 12px 18px !important;
                 font-size: 14px !important;
             }
@@ -276,6 +276,15 @@
                 padding: 15px !important;
                 margin: 8px 0 !important;
             }
+            
+            /* 小屏幕时删除按钮默认隐藏，悬停时显示 */
+            .todo-item button, .daily-task button {
+                display: none !important;
+            }
+            
+            .todo-item:hover button, .daily-task:hover button {
+                display: inline-block !important;
+            }
         }
 
         .task-wrapper {
@@ -286,37 +295,45 @@
         }
 
         /* 响应式标题 */
-        h1 {
-            text-align: center;
-            font-size: 32px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            margin-top: 70px;
-            display: inline-block;
-            padding: 10px 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            max-width: 90%;
-            word-break: keep-all;
-        }
+   h1 {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+    margin-top: 70px;
+    display: inline-block;
+    padding: 10px 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    max-width: 90%;
+    word-break: keep-all;
+position: relative;
+}
+h1::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 1px 1px rgba(255, 255, 255, 0.2) inset;
+    z-index: -1;
+    border-radius: 12px;
+    width: 100%;
 
-        h1::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.5);
-            z-index: -1;
-            border-radius: 12px;
-            width: 100%;
-        }
-
+}
         /* 触摸友好的按钮 */
-        .change-bg-btn, .add-btn, .set-daily-btn {
+        .change-bg-btn, .add-btn, .set-daily-btn, .add-toggle-btn {
             padding: 12px 20px;
             background-color: #7ec5ba;
             color: white;
@@ -334,23 +351,21 @@
             min-height: 44px;
         }
 
-        @media (hover: hover) {
-            .change-bg-btn:hover, .add-btn:hover, .set-daily-btn:hover {
-                box-shadow: var(--hover-shadow, var(--hover-shadow-light));
-            }
+        .change-bg-btn:hover, .add-btn:hover, .set-daily-btn:hover, .add-toggle-btn:hover {
+            box-shadow: var(--hover-shadow, var(--hover-shadow-light));
         }
         
-        .change-bg-btn:active, .add-btn:active, .set-daily-btn:active {
+        .change-bg-btn:active, .add-btn:active, .set-daily-btn:active, .add-toggle-btn:active {
             transform: translateY(2px);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        .change-bg-btn, .add-btn, .set-daily-btn {
+        .change-bg-btn, .add-btn, .set-daily-btn, .add-toggle-btn {
             color: white !important;
             font-weight: bold;
         }
 
-        /* 修复：PC端固定高度的任务容器 */
+        /* PC端固定高度的任务容器 */
         .left-container, .right-container {
             padding: 20px;
             background-color: #fff;
@@ -369,6 +384,9 @@
                 margin-bottom: 20px;
                 padding-bottom: 10px;
                 border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
             
             .add-todo, .add-daily-task {
@@ -406,6 +424,17 @@
             
             .task-list-container::-webkit-scrollbar-thumb:hover {
                 background: #a8a8a8;
+            }
+        }
+
+        /* 小屏幕标题布局调整 */
+        @media (max-width: 767px) {
+            .left-container > h2,
+            .right-container > h2 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
             }
         }
 
@@ -458,6 +487,7 @@
             background-color: #e0e0e0;
         }
 
+        /* 删除按钮样式 - 默认隐藏，悬停时显示 */
         .todo-item button, .daily-task button {
             background-color: #ff4747;
             color: white;
@@ -465,17 +495,37 @@
             border-radius: 12px;
             padding: 6px 12px;
             cursor: pointer;
-            display: none;
+            display: none; /* 默认隐藏 */
             position: absolute;
             right: 10px;
             top: 50%;
             transform: translateY(-50%); /* 垂直居中 */
             min-height: 36px;
             min-width: 60px;
+            z-index: 10; /* 确保在文本上方 */
+        }
+
+        /* 修复：已完成任务的删除按钮不会显示删除线 */
+        .todo-item.completed button, 
+        .daily-task.completed button {
+            text-decoration: none !important;
         }
 
         .todo-item button:hover, .daily-task button:hover {
             background-color: #ff3333;
+        }
+
+        /* 悬停时显示删除按钮 */
+        .todo-item:hover button, .daily-task:hover button {
+            display: inline-block;
+        }
+
+        /* 确保已完成任务的文字有删除线，但删除按钮没有 */
+        .todo-item.completed > div > span,
+        .daily-task.completed > div > span {
+            text-decoration: line-through;
+            color: #888;
+            opacity: 0.7;
         }
 
         .date-group h3 {
@@ -484,27 +534,6 @@
             margin: 15px 0 8px;
             padding-bottom: 5px;
             border-bottom: 1px solid #eee;
-        }
-
-        @media (max-width: 767px) {
-            .todo-item button, .daily-task button {
-                display: inline-block;
-                position: static;
-                margin-top: 10px;
-                width: 100%;
-                transform: none; /* 移动端不需要垂直居中 */
-                top: auto;
-            }
-            
-            .todo-item, .daily-task {
-                padding-bottom: 50px !important;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .todo-item:hover button, .daily-task:hover button {
-                display: inline-block;
-            }
         }
 
         .date-group {
@@ -962,11 +991,204 @@
         .archive-content::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        /* ========== 新增：浮窗样式 ========== */
+        .form-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .form-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .form-panel {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .form-overlay.active .form-panel {
+            transform: translateY(0);
+        }
+        
+        .close-form-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+            line-height: 1;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .close-form-btn:hover {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .form-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-right: 30px;
+            color: #333;
+        }
+        
+        /* 隐藏原来的输入区域 */
+        .add-todo, .add-daily-task {
+            display: none !important;
+        }
+
+        /* 添加按钮样式调整 */
+        .add-toggle-btn {
+            padding: 8px 16px !important;
+            min-width: 44px;
+            min-height: 44px;
+            font-size: 18px !important;
+            margin-left: 10px;
+        }
+
+        /* 标题区域样式 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* 用户名设置样式 */
+        .name-setup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .name-setup-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .name-setup-panel {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        
+        .name-setup-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .name-setup-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #7ec5ba;
+        }
+        
+        .name-submit-btn {
+            padding: 12px 40px;
+            background-color: #7ec5ba;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .name-submit-btn:hover {
+            background-color: #6fbf9d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(126, 197, 186, 0.4);
+        }
+        
+        .name-error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
+<div id="nameSetupOverlay" class="name-setup-overlay">
+    <div class="name-setup-panel">
+        <h2 class="name-setup-title">欢迎使用品言计划</h2>
+        <p class="name-setup-subtitle">请输入您的用户名（2个汉字）</p>
+        <input type="text" id="userNameInput" class="name-input" maxlength="2" placeholder="请输入2个汉字">
+        <p id="nameError" class="name-error">请输入2个汉字作为用户名</p>
+        <button class="name-submit-btn" onclick="setUserName()">开始使用</button>
+    </div>
+</div>
+
 <h1 id="greeting"></h1>
+<div id="dateDisplay" class="date-display"></div>
 
 <!-- 菜单容器 -->
 <div class="menu-container">
@@ -1018,6 +1240,45 @@
     </div>
 </div>
 
+<!-- 日常任务浮窗 -->
+<div class="form-overlay" id="dailyTaskFormOverlay">
+    <div class="form-panel">
+        <button class="close-form-btn" onclick="toggleDailyTaskForm()">×</button>
+        <h3 class="form-title">添加日常任务</h3>
+        <div class="add-daily-task-form">
+            <input type="text" id="dailyTaskInputForm" placeholder="输入日常任务" />
+            <div class="input-row">
+                <input type="time" id="dailyTaskStartTimeForm" />
+                <input type="time" id="dailyTaskEndTimeForm" />
+            </div>
+            <div class="button-container">
+                <button class="set-daily-btn" onclick="addDailyTaskFromForm()">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 普通任务浮窗 -->
+<div class="form-overlay" id="todoFormOverlay">
+    <div class="form-panel">
+        <button class="close-form-btn" onclick="toggleTodoForm()">×</button>
+        <h3 class="form-title">添加普通任务</h3>
+        <div class="add-todo-form">
+            <div class="input-row">
+                <input type="date" id="todoDateForm" value="" />
+                <input type="text" id="todoInputForm" placeholder="添加待办事项" />
+            </div>
+            <div class="input-row">
+                <input type="time" id="todoStartTimeForm" />
+                <input type="time" id="todoEndTimeForm" />
+            </div>
+            <div class="button-container">
+                <button class="add-btn" onclick="addTodoFromForm()">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="background" id="background"></div>
 
 <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="setBackgroundImage(event)">
@@ -1025,21 +1286,8 @@
 <div class="task-wrapper">
     <div class="container">
         <div class="left-container">
-            <h2>普通任务</h2>
-            <div class="add-todo">
-                <div class="input-row">
-                    <input type="date" id="todoDate" value="" />
-                    <input type="text" id="todoInput" placeholder="添加待办事项" />
-                </div>
-                <div class="input-row">
-                    <input type="time" id="todoStartTime" />
-                    <input type="time" id="todoEndTime" />
-                </div>
-                <div class="button-container">
-                    <button class="add-btn" onclick="addTodo()">添加</button>
-                </div>
-            </div>
-
+            <h2>普通任务 <button class="add-toggle-btn" onclick="toggleTodoForm()">+</button></h2>
+            
             <!-- 固定高度的滚动容器 -->
             <div class="task-list-container">
                 <div id="todoList"></div>
@@ -1047,17 +1295,7 @@
         </div>
 
         <div class="right-container">
-            <h2>日常任务</h2>
-            <div class="add-daily-task">
-                <input type="text" id="dailyTaskInput" placeholder="输入日常任务" />
-                <div class="input-row">
-                    <input type="time" id="dailyTaskStartTime" />
-                    <input type="time" id="dailyTaskEndTime" />
-                </div>
-                <div class="button-container">
-                    <button class="set-daily-btn" onclick="setDailyTask()">设置日常任务</button>
-                </div>
-            </div>
+            <h2>日常任务 <button class="add-toggle-btn" onclick="toggleDailyTaskForm()">+</button></h2>
             
             <!-- 固定高度的滚动容器 -->
             <div class="task-list-container">
@@ -1068,9 +1306,8 @@
 </div>
 
 <script>
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    // 初始化数据
+    // 全局变量
+    let userName = localStorage.getItem('userName') || '';
     let todoData = JSON.parse(localStorage.getItem('todoData')) || [];
     let dailyTaskData = JSON.parse(localStorage.getItem('dailyTaskData')) || [];
     let archivedTodos = JSON.parse(localStorage.getItem('archivedTodos')) || [];
@@ -1082,10 +1319,115 @@
     // 菜单状态
     let isMenuOpen = false;
 
+    // 用户名设置
+    function checkUserName() {
+        if (!userName) {
+            document.getElementById('nameSetupOverlay').classList.remove('hidden');
+        } else {
+            document.getElementById('nameSetupOverlay').classList.add('hidden');
+            updateGreeting();
+      
+        }
+    }
+
+    function setUserName() {
+        const nameInput = document.getElementById('userNameInput').value;
+        const nameError = document.getElementById('nameError');
+        
+        // 检查是否为2个汉字
+        const chineseRegex = /^[\u4e00-\u9fa5]{2}$/;
+        
+        if (!chineseRegex.test(nameInput)) {
+            nameError.style.display = 'block';
+            return;
+        }
+        
+        nameError.style.display = 'none';
+        userName = nameInput;
+        localStorage.setItem('userName', userName);
+        document.getElementById('nameSetupOverlay').classList.add('hidden');
+        updateGreeting();
+          }
+
+    // 节日问候判断
+    function getFestivalGreeting() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        
+        // 4月3日显示生日快乐
+        if (month === 4 && day === 3) {
+            return "生日快乐";
+        }
+        
+        // 其他节日可以在这里添加
+        // 例如：
+        // if (month === 1 && day === 1) return "元旦快乐";
+        // if (month === 2 && day === 14) return "情人节快乐";
+        // if (month === 10 && day === 1) return "国庆节快乐";
+        
+        return null;
+    }
+
+    // 根据时间获取问候语（修改版，加入节日判断）
+    function getGreeting() {
+        const festivalGreeting = getFestivalGreeting();
+        if (festivalGreeting) {
+            return `${festivalGreeting}，${userName}！`;
+        }
+        
+        const now = new Date();
+        const hour = now.getHours();
+        
+        if (hour >= 23 || hour < 4) {
+            return `晚安，${userName}！`;
+        } else if (hour < 6) {
+            return `凌晨好，${userName}！`;
+        } else if (hour < 9) {
+            return `早上好，${userName}！`;
+        } else if (hour < 12) {
+            return `上午好，${userName}！`;
+        } else if (hour < 14) {
+            return `中午好，${userName}！`;
+        } else if (hour < 18) {
+            return `下午好，${userName}！`;
+        } else {
+            return `晚上好，${userName}！`;
+        }
+    }
+
+    function updateGreeting() {
+        const greetingElement = document.getElementById('greeting');
+        if (greetingElement) {
+            greetingElement.textContent = getGreeting();
+        }
+    }
+    // 格式化日期显示（用于普通任务板块）
+    function formatDateForDisplay(dateStr) {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        
+        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const weekday = weekdays[date.getDay()];
+        
+        // 如果是今年，不显示年份
+        if (year === currentYear) {
+            return `${month}月${day}日 ${weekday}`;
+        } else {
+            return `${year}年${month}月${day}日 ${weekday}`;
+        }
+    }
+
     // 数据初始化函数
     function initializeData() {
-        // 检查是否需要0点重置日常任务
+        // 检查是否需要0点重置日常任务和归档任务
         checkAndResetDailyTasks();
+        checkAndArchiveOldTasks(); // 新增：检查是否需要归档旧任务
         
         // 添加完成状态到现有数据（兼容旧数据）
         dailyTaskData = dailyTaskData.map(task => {
@@ -1134,8 +1476,75 @@
         }
     }
 
+    // 新增：检查并归档昨天的已完成任务
+    function checkAndArchiveOldTasks() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const yesterday = new Date(now.getTime() - 86400000).toISOString().split('T')[0];
+        
+        // 检查是否有昨天完成的任务需要归档
+        let hasChanges = false;
+        
+        // 找出昨天完成但未归档的任务
+        const yesterdayCompletedTodos = todoData.filter(todo => {
+            return todo.date === yesterday && todo.completed && !todo.archived;
+        });
+        
+        if (yesterdayCompletedTodos.length > 0) {
+            console.log(`发现 ${yesterdayCompletedTodos.length} 个昨天完成的任务需要归档`);
+            
+            // 归档这些任务
+            yesterdayCompletedTodos.forEach(todo => {
+                archiveTodo(todo, true); // true表示这是昨天的任务
+            });
+            
+            hasChanges = true;
+        }
+        
+        // 找出前天或更早的已完成任务（包括今天的旧任务）
+        const oldCompletedTodos = todoData.filter(todo => {
+            if (!todo.completed) return false;
+            
+            // 如果是今天的任务，不归档
+            if (todo.date === today) return false;
+            
+            // 标记为已归档，避免重复处理
+            return !todo.archived;
+        });
+        
+        if (oldCompletedTodos.length > 0) {
+            console.log(`发现 ${oldCompletedTodos.length} 个旧任务需要归档`);
+            
+            oldCompletedTodos.forEach(todo => {
+                archiveTodo(todo, true);
+            });
+            
+            hasChanges = true;
+        }
+        
+        if (hasChanges) {
+            // 保存更新后的数据
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
+            
+            // 重新渲染任务列表
+            renderTodos();
+        }
+    }
+
     // 设置默认日期为今天
-    document.getElementById("todoDate").value = new Date().toISOString().split('T')[0];
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("todoDateForm").value = new Date().toISOString().split('T')[0];
+        // 检查用户名
+        checkUserName();
+        
+        // 监听用户名输入框的Enter键
+        document.getElementById('userNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                setUserName();
+            }
+        });
+    });
 
     // 自定义确认对话框函数
     function showConfirm(title, message, callback) {
@@ -1163,46 +1572,6 @@
             confirmCallback();
         }
         hideConfirm();
-    }
-
-    // 根据时间获取问候语
-    function getGreeting() {
-        const now = new Date();
-        const hour = now.getHours();
-        
-        let greeting = "";
-        
-        if (hour >= 23 || hour < 4) {
-            greeting = "晚安，品言！";
-        } else if (hour < 6) {
-            greeting = "凌晨好，品言！";
-        } else if (hour < 9) {
-            greeting = "早上好，品言！";
-        } else if (hour < 12) {
-            greeting = "上午好，品言！";
-        } else if (hour < 14) {
-            greeting = "中午好，品言！";
-        } else if (hour < 18) {
-            greeting = "下午好，品言！";
-        } else {
-            greeting = "晚上好，品言！";
-        }
-        
-        return greeting;
-    }
-
-    function updateGreeting() {
-        const greetingElement = document.getElementById('greeting');
-        if (greetingElement) {
-            greetingElement.textContent = getGreeting();
-            
-            if (isMobile) {
-                const length = getGreeting().length;
-                if (length > 6) {
-                    greetingElement.style.fontSize = '26px';
-                }
-            }
-        }
     }
 
     function getColorBrightness(rgbStr) {
@@ -1265,24 +1634,13 @@
                 confirmBtn.style.setProperty('--hover-color', hoverColor);
             }
             
-            if (isMobile) {
-                button.ontouchstart = function(e) {
-                    this.style.backgroundColor = hoverColor;
-                    e.preventDefault();
-                };
-                
-                button.ontouchend = function() {
-                    this.style.backgroundColor = baseColor;
-                };
-            } else {
-                button.onmouseenter = function() {
-                    this.style.backgroundColor = hoverColor;
-                };
-                
-                button.onmouseleave = function() {
-                    this.style.backgroundColor = baseColor;
-                };
-            }
+            button.onmouseenter = function() {
+                this.style.backgroundColor = hoverColor;
+            };
+            
+            button.onmouseleave = function() {
+                this.style.backgroundColor = baseColor;
+            };
         });
     }
 
@@ -1300,12 +1658,12 @@
             const pixel = ctx.getImageData(0, 0, 1, 1).data;
             const baseColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 
-            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .add-toggle-btn, .confirm-btn.confirm');
             updateButtonStyles(buttons, baseColor);
         };
         
         img.onerror = function() {
-            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .add-toggle-btn, .confirm-btn.confirm');
             const defaultColor = '#7ec5ba';
             updateButtonStyles(buttons, defaultColor);
         };
@@ -1382,6 +1740,7 @@
             // 添加几个普通任务示例
             const today = new Date().toISOString().split('T')[0];
             const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             
             // 今天的有时间任务
             todoData.push({
@@ -1390,7 +1749,8 @@
                 startTime: '09:00',
                 endTime: '11:00',
                 id: Date.now() + 1,
-                completed: false
+                completed: false,
+                archived: false
             });
             
             // 今天的无时间任务
@@ -1400,7 +1760,8 @@
                 startTime: '',
                 endTime: '',
                 id: Date.now() + 2,
-                completed: false
+                completed: false,
+                archived: false
             });
             
             // 明天的任务
@@ -1410,7 +1771,19 @@
                 startTime: '14:00',
                 endTime: '16:00',
                 id: Date.now() + 3,
-                completed: false
+                completed: false,
+                archived: false
+            });
+            
+            // 昨天的已完成任务（示例）
+            todoData.push({
+                task: '昨天完成的任务示例',
+                date: yesterday,
+                startTime: '10:00',
+                endTime: '12:00',
+                id: Date.now() + 8,
+                completed: true,
+                archived: false
             });
             
             // 添加日常任务示例
@@ -1430,8 +1803,7 @@
                 id: Date.now() + 5
             });
             
-            // 添加归档任务示例（模拟昨天完成的任务）
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            // 添加归档任务示例（模拟之前完成的任务）
             archivedTodos.push({
                 task: '整理工作台',
                 date: yesterday,
@@ -1464,7 +1836,7 @@
     }
 
     window.onload = function() {
-        updateGreeting();
+        checkUserName();
         loadBackground();
         initializeData(); // 初始化数据，包括排序和0点重置检查
         
@@ -1475,43 +1847,39 @@
         renderDailyTasks();
         renderTodos();
         
-        const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+        const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .add-toggle-btn, .confirm-btn.confirm');
         const defaultColor = '#7ec5ba';
         updateButtonStyles(buttons, defaultColor);
         
-        if (isMobile) {
-            document.querySelectorAll('.todo-item, .daily-task').forEach(item => {
-                item.ontouchstart = function() {
-                    this.style.backgroundColor = '#e0e0e0';
-                };
-                
-                item.ontouchend = function() {
-                    this.style.backgroundColor = '#fff';
-                };
-            });
-        }
+        // 设置浮窗的点击外部关闭事件
+        setupFormOverlayEvents();
         
         // 每小时检查一次时间，用于更新问候语
         setInterval(updateGreeting, 60 * 60 * 1000);
         
-        // 每分钟检查一次是否到了0点需要重置日常任务
+        // 每分钟检查一次是否到了0点需要重置日常任务和归档任务
         setInterval(checkMidnightReset, 60 * 1000);
+        
+        
     };
 
-    // 检查是否到达0点需要重置日常任务
+    // 检查是否到达0点需要重置日常任务和归档任务
     function checkMidnightReset() {
         const now = new Date();
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
         
-        // 在0点整重置（允许前后几分钟的误差）
+        // 在0点整执行（允许前后几分钟的误差）
         if (currentHour === 0 && currentMinute < 5) {
             const today = now.toDateString();
             if (lastResetDate !== today) {
-                // 重置所有日常任务的完成状态
+                // 1. 重置所有日常任务的完成状态
                 dailyTaskData.forEach(task => {
                     task.completed = false;
                 });
+                
+                // 2. 归档昨天的已完成任务
+                checkAndArchiveOldTasks();
                 
                 // 更新最后重置日期
                 lastResetDate = today;
@@ -1521,7 +1889,7 @@
                 // 重新渲染日常任务
                 renderDailyTasks();
                 
-                console.log('日常任务已在0点自动重置');
+                console.log('日常任务已在0点自动重置，并检查了任务归档');
             }
         }
         
@@ -1559,10 +1927,70 @@
         }
     });
 
-    function setDailyTask() {
-        const dailyTaskInput = document.getElementById('dailyTaskInput').value;
-        const dailyTaskStartTime = document.getElementById('dailyTaskStartTime').value;
-        const dailyTaskEndTime = document.getElementById('dailyTaskEndTime').value;
+    // ========== 新增：浮窗功能 ==========
+    function toggleDailyTaskForm() {
+        const overlay = document.getElementById('dailyTaskFormOverlay');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+        
+        // 如果打开浮窗，聚焦到第一个输入框
+        if (overlay.classList.contains('active')) {
+            setTimeout(() => {
+                document.getElementById('dailyTaskInputForm').focus();
+            }, 100);
+        }
+    }
+    
+    function toggleTodoForm() {
+        const overlay = document.getElementById('todoFormOverlay');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+        
+        // 如果打开浮窗，设置默认日期并聚焦
+        if (overlay.classList.contains('active')) {
+            document.getElementById('todoDateForm').value = new Date().toISOString().split('T')[0];
+            setTimeout(() => {
+                document.getElementById('todoInputForm').focus();
+            }, 100);
+        }
+    }
+    
+    // 设置浮窗点击外部关闭事件
+    function setupFormOverlayEvents() {
+        // 日常任务浮窗
+        document.getElementById('dailyTaskFormOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                toggleDailyTaskForm();
+            }
+        });
+        
+        // 普通任务浮窗
+        document.getElementById('todoFormOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                toggleTodoForm();
+            }
+        });
+        
+        // 按ESC键关闭浮窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dailyOverlay = document.getElementById('dailyTaskFormOverlay');
+                const todoOverlay = document.getElementById('todoFormOverlay');
+                
+                if (dailyOverlay.classList.contains('active')) {
+                    toggleDailyTaskForm();
+                } else if (todoOverlay.classList.contains('active')) {
+                    toggleTodoForm();
+                }
+            }
+        });
+    }
+
+    // 从浮窗添加日常任务
+    function addDailyTaskFromForm() {
+        const dailyTaskInput = document.getElementById('dailyTaskInputForm').value;
+        const dailyTaskStartTime = document.getElementById('dailyTaskStartTimeForm').value;
+        const dailyTaskEndTime = document.getElementById('dailyTaskEndTimeForm').value;
 
         if (dailyTaskInput) {
             const dailyTask = {
@@ -1580,16 +2008,65 @@
             
             localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
             renderDailyTasks();
-            resetDailyTaskInput();
             
-            if (isMobile) {
-                document.activeElement.blur();
-            }
+            // 关闭浮窗并重置表单
+            toggleDailyTaskForm();
+            resetDailyTaskForm();
         } else {
             showConfirm('提示', '请输入日常任务！', function() {
                 // 空回调，只是显示提示
             });
         }
+    }
+    
+    // 从浮窗添加普通任务
+    function addTodoFromForm() {
+        const todoInput = document.getElementById('todoInputForm').value;
+        const todoDate = document.getElementById('todoDateForm').value;
+        const todoStartTime = document.getElementById('todoStartTimeForm').value;
+        const todoEndTime = document.getElementById('todoEndTimeForm').value;
+
+        if (todoInput && todoDate) {
+            const newTodo = {
+                task: todoInput,
+                date: todoDate,
+                startTime: todoStartTime || '',
+                endTime: todoEndTime || '',
+                id: new Date().getTime(),
+                completed: false,
+                archived: false
+            };
+
+            todoData.push(newTodo);
+            
+            // 重新排序
+            sortTodoData();
+            
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            renderTodos();
+            
+            // 关闭浮窗并重置表单
+            toggleTodoForm();
+            resetTodoForm();
+        } else {
+            showConfirm('提示', '请输入待办事项和日期！', function() {
+                // 空回调，只是显示提示
+            });
+        }
+    }
+    
+    // 重置日常任务表单
+    function resetDailyTaskForm() {
+        document.getElementById('dailyTaskInputForm').value = '';
+        document.getElementById('dailyTaskStartTimeForm').value = '';
+        document.getElementById('dailyTaskEndTimeForm').value = '';
+    }
+    
+    // 重置普通任务表单
+    function resetTodoForm() {
+        document.getElementById('todoInputForm').value = '';
+        document.getElementById('todoStartTimeForm').value = '';
+        document.getElementById('todoEndTimeForm').value = '';
     }
 
     function renderDailyTasks() {
@@ -1625,19 +2102,11 @@
         dailyTaskDiv.innerHTML = taskContent;
 
         // 添加点击事件
-        if (isMobile) {
-            dailyTaskDiv.ontouchstart = function(e) {
-                if (e.target.tagName !== 'BUTTON') {
-                    toggleDailyTaskComplete(dailyTask.id, this);
-                }
-            };
-        } else {
-            dailyTaskDiv.onclick = function(e) {
-                if (e.target.tagName !== 'BUTTON') {
-                    toggleDailyTaskComplete(dailyTask.id, this);
-                }
-            };
-        }
+        dailyTaskDiv.onclick = function(e) {
+            if (e.target.tagName !== 'BUTTON') {
+                toggleDailyTaskComplete(dailyTask.id, this);
+            }
+        };
 
         const deleteButton = document.createElement('button');
         deleteButton.innerText = '删除';
@@ -1649,18 +2118,6 @@
                 performDailyTaskDeletion();
             });
         };
-        
-        if (isMobile) {
-            deleteButton.ontouchstart = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                deleteDailyTaskData = dailyTask;
-                deleteDailyTaskDiv = dailyTaskDiv;
-                showConfirm('删除确认', `确定要删除"${dailyTask.task}"这个日常任务吗？`, function() {
-                    performDailyTaskDeletion();
-                });
-            };
-        }
         
         dailyTaskDiv.appendChild(deleteButton);
         dailyTaskList.appendChild(dailyTaskDiv);
@@ -1698,42 +2155,6 @@
         }
     }
 
-    function addTodo() {
-        const todoInput = document.getElementById('todoInput').value;
-        const todoDate = document.getElementById('todoDate').value;
-        const todoStartTime = document.getElementById('todoStartTime').value;
-        const todoEndTime = document.getElementById('todoEndTime').value;
-
-        if (todoInput && todoDate) {
-            const newTodo = {
-                task: todoInput,
-                date: todoDate,
-                startTime: todoStartTime || '',
-                endTime: todoEndTime || '',
-                id: new Date().getTime(),
-                completed: false
-            };
-
-            todoData.push(newTodo);
-            
-            // 重新排序
-            sortTodoData();
-            
-            localStorage.setItem('todoData', JSON.stringify(todoData));
-            renderTodos();
-            document.getElementById('todoDate').value = newTodo.date;
-            resetInputFields();
-            
-            if (isMobile) {
-                document.activeElement.blur();
-            }
-        } else {
-            showConfirm('提示', '请输入待办事项和日期！', function() {
-                // 空回调，只是显示提示
-            });
-        }
-    }
-
     function renderTodos() {
         // 先排序
         sortTodoData();
@@ -1758,18 +2179,8 @@
             dateGroup.className = 'date-group';
             const dateLabel = document.createElement('h3');
             
-            // 格式化日期显示
-            const today = new Date().toISOString().split('T')[0];
-            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-            
-            let displayDate = date;
-            if (date === today) {
-                displayDate = '今天';
-            } else if (date === tomorrow) {
-                displayDate = '明天';
-            }
-            
-            dateLabel.innerText = displayDate;
+            // 使用新的日期格式化函数
+            dateLabel.innerText = formatDateForDisplay(date);
             dateGroup.appendChild(dateLabel);
             
             groupedTodos[date].forEach(todo => {
@@ -1796,19 +2207,11 @@
                 `;
                 
                 // 添加点击事件
-                if (isMobile) {
-                    todoItem.ontouchstart = function(e) {
-                        if (e.target.tagName !== 'BUTTON') {
-                            toggleTodoComplete(todo.id, this);
-                        }
-                    };
-                } else {
-                    todoItem.onclick = function(e) {
-                        if (e.target.tagName !== 'BUTTON') {
-                            toggleTodoComplete(todo.id, this);
-                        }
-                    };
-                }
+                todoItem.onclick = function(e) {
+                    if (e.target.tagName !== 'BUTTON') {
+                        toggleTodoComplete(todo.id, this);
+                    }
+                };
                 
                 dateGroup.appendChild(todoItem);
             });
@@ -1822,10 +2225,8 @@
             todo.completed = !todo.completed;
             todoItem.classList.toggle('completed');
             
-            // 如果任务完成，自动归档
-            if (todo.completed) {
-                archiveTodo(todo);
-            }
+            // 当日完成的任务不立即归档，等到第二天0点再归档
+            // 只标记为已完成，不调用 archiveTodo 函数
             
             // 重新排序
             sortTodoData();
@@ -1836,9 +2237,20 @@
         }
     }
 
-    // 归档任务函数
-    function archiveTodo(todo) {
+    // 修改归档任务函数，添加isOldTask参数
+    function archiveTodo(todo, isOldTask = false) {
         const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        
+        // 如果是今天的任务，不归档（除非是0点触发的旧任务归档）
+        if (todo.date === today && !isOldTask) {
+            console.log('今日任务不立即归档，等待0点处理');
+            return;
+        }
+        
+        // 标记任务为已归档
+        todo.archived = true;
+        
         const archivedTask = {
             ...todo,
             archivedDate: now.toISOString().split('T')[0], // 归档日期
@@ -1849,15 +2261,23 @@
             })
         };
         
-        // 从todoData中移除已归档的任务
-        todoData = todoData.filter(t => t.id !== todo.id);
-        localStorage.setItem('todoData', JSON.stringify(todoData));
+        // 如果是0点触发的旧任务归档，不移除主列表中的任务
+        // 只在新归档任务中添加，但主列表中仍然保留（标记为已归档）
+        if (!isOldTask) {
+            // 从todoData中移除已归档的任务（当日手动归档的情况）
+            todoData = todoData.filter(t => t.id !== todo.id);
+        }
         
         archivedTodos.unshift(archivedTask); // 添加到开头（最新的在前）
+        localStorage.setItem('todoData', JSON.stringify(todoData));
         localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
         
-        // 立即重新渲染主界面的任务列表
-        renderTodos();
+        if (!isOldTask) {
+            // 立即重新渲染主界面的任务列表（仅当日手动归档时）
+            renderTodos();
+        }
+        
+        console.log(`任务"${todo.task}"已归档`);
     }
 
     // 归档功能
@@ -1903,18 +2323,8 @@
             const dateLabel = document.createElement('h3');
             dateLabel.className = 'archive-date-title';
             
-            // 格式化日期显示 - 与主界面完全一致
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            
-            let displayDate = date;
-            if (date === today) {
-                displayDate = '今天';
-            } else if (date === yesterday) {
-                displayDate = '昨天';
-            }
-            
-            dateLabel.innerText = displayDate;
+            // 使用新的日期格式化函数
+            dateLabel.innerText = formatDateForDisplay(date);
             dateGroup.appendChild(dateLabel);
             
             // 按时间排序 - 与主界面逻辑一致
@@ -1960,9 +2370,9 @@
         }
     }
     
-    // 清空归档
+    // 清空归档 - 修改提示信息
     function clearArchive() {
-        showConfirm('清空归档', '确定要清空所有归档的任务吗？此操作不可恢复！', function() {
+        showConfirm('清空归档', '确定要清空所有归档的任务吗？', function() {
             archivedTodos = [];
             localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
             renderArchive();
@@ -1987,18 +2397,6 @@
             renderTodos();
             deleteTodoId = null;
         }
-    }
-
-    function resetInputFields() {
-        document.getElementById('todoInput').value = '';
-        document.getElementById('todoStartTime').value = '';
-        document.getElementById('todoEndTime').value = '';
-    }
-
-    function resetDailyTaskInput() {
-        document.getElementById('dailyTaskInput').value = '';
-        document.getElementById('dailyTaskStartTime').value = '';
-        document.getElementById('dailyTaskEndTime').value = '';
     }
 
     function changeBackground() {
@@ -2050,31 +2448,6 @@
             hideConfirm();
         }
     });
-    
-    // 防止移动设备上的双击缩放
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-    
-    // 阻止iOS上的橡皮筋效果
-    document.body.addEventListener('touchmove', function(e) {
-        if (e.target.classList.contains('task-list-container') || 
-            e.target.closest('.task-list-container')) {
-            return;
-        }
-        
-        const scrollable = document.querySelector('.task-wrapper');
-        if (scrollable.scrollTop === 0) {
-            scrollable.scrollTop = 1;
-        } else if (scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight) {
-            scrollable.scrollTop = scrollable.scrollTop - 1;
-        }
-    }, { passive: false });
 </script>
 </body>
 </html>
