@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>品言的计划</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: blur(8px);
+            transform: scale(1.01);
+        }
+
+        /* 新增菜单样式 - 简约版本 */
+        .menu-container {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+        }
+        
+        .menu-btn {
+            padding: 10px 16px;
+            background-color: #7ec5ba;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .menu-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-btn::after {
+            content: "▼";
+            font-size: 9px;
+            margin-left: 4px;
+            opacity: 0.9;
+        }
+        
+        .menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            min-width: 140px;
+            margin-top: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+            z-index: 100;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .menu-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .menu-item {
+            padding: 10px 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            transition: background-color 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f8f8f8;
+            font-weight: 500;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f8f8;
+            color: #000;
+        }
+        
+        .menu-item:active {
+            background-color: #f0f0f0;
+        }
+        
+        .menu-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        /* 简约黑色图标 - 使用CSS绘制 */
+        .icon-bg {
+            position: relative;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid #333;
+            border-radius: 2px;
+        }
+        
+        .icon-bg::before {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 1.5px solid #333;
+            border-radius: 1px;
+            top: 2px;
+            left: 2px;
+        }
+        
+        .icon-archive {
+            position: relative;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .icon-archive::before {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 10px;
+            border: 1.5px solid #333;
+            border-top: none;
+            border-radius: 0 0 2px 2px;
+            top: 4px;
+            left: 0;
+        }
+        
+        .icon-archive::after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 1.5px;
+            background: #333;
+            top: 4px;
+            left: 3px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 10px;
+        }
+
+        /* 响应式布局 */
+        @media (min-width: 768px) {
+            .container {
+                display: flex;
+                justify-content: space-between;
+                margin: 100px auto 20px;
+                padding: 20px;
+                width: 90%;
+                height: calc(100vh - 140px);
+                min-height: 600px;
+            }
+            
+            .left-container, .right-container {
+                width: 48%;
+                margin-right: 2%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .right-container {
+                margin-left: 2%;
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-container, .right-container {
+                width: 100%;
+                margin: 0 0 20px 0;
+            }
+            
+            h1 {
+                font-size: 28px !important;
+                padding: 8px 20px !important;
+                margin-top: 60px !important;
+            }
+            
+            .menu-container {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .menu-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+                min-height: 38px;
+            }
+            
+            .menu-dropdown {
+                min-width: 130px;
+            }
+            
+            .menu-item {
+                padding: 9px 12px;
+                font-size: 12.5px;
+            }
+            
+            .change-bg-btn, .add-btn, .set-daily-btn {
+                padding: 12px 18px !important;
+                font-size: 14px !important;
+            }
+            
+            input[type="text"], input[type="time"], input[type="date"] {
+                padding: 15px !important;
+                font-size: 16px !important;
+            }
+            
+            .button-container button {
+                padding: 15px !important;
+            }
+            
+            .todo-item, .daily-task {
+                padding: 15px !important;
+                margin: 8px 0 !important;
+            }
+        }
+
+        .task-wrapper {
+            width: 100%;
+            overflow-y: auto;
+            max-height: calc(100vh - 140px);
+            padding: 0 5px;
+        }
+
+        /* 响应式标题 */
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            margin-top: 70px;
+            display: inline-block;
+            padding: 10px 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            max-width: 90%;
+            word-break: keep-all;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.5);
+            z-index: -1;
+            border-radius: 12px;
+            width: 100%;
+        }
+
+        /* 触摸友好的按钮 */
+        .change-bg-btn, .add-btn, .set-daily-btn {
+            padding: 12px 20px;
+            background-color: #7ec5ba;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 
+                background-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.1s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            --hover-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.25);
+            --hover-shadow-dark: 0 4px 12px rgba(255, 255, 255, 0.15);
+            min-height: 44px;
+        }
+
+        @media (hover: hover) {
+            .change-bg-btn:hover, .add-btn:hover, .set-daily-btn:hover {
+                box-shadow: var(--hover-shadow, var(--hover-shadow-light));
+            }
+        }
+        
+        .change-bg-btn:active, .add-btn:active, .set-daily-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .change-bg-btn, .add-btn, .set-daily-btn {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        /* 修复：PC端固定高度的任务容器 */
+        .left-container, .right-container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden; /* 隐藏溢出的滚动条 */
+        }
+
+        /* PC端固定高度，内部滚动 */
+        @media (min-width: 768px) {
+            .left-container > h2,
+            .right-container > h2 {
+                margin-top: 0;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .add-todo, .add-daily-task {
+                flex-shrink: 0;
+                margin-bottom: 20px;
+            }
+            
+            /* 滚动内容区域 - 固定在圆角内 */
+            .task-list-container {
+                flex: 1;
+                overflow-y: auto;
+                border-radius: 12px;
+                margin: 0 -10px;
+                padding: 0 10px;
+                position: relative;
+            }
+            
+            /* 优化滚动条样式 - 与圆角对齐 */
+            .task-list-container::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            .task-list-container::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+                margin: 10px 0;
+            }
+            
+            .task-list-container::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 10px;
+                border: 2px solid #fff;
+                background-clip: padding-box;
+            }
+            
+            .task-list-container::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+            }
+        }
+
+        /* 移动端样式 */
+        @media (max-width: 767px) {
+            .task-list-container {
+                overflow-y: visible;
+            }
+        }
+
+        input[type="text"], input[type="time"], input[type="date"] {
+            padding: 14px;
+            margin-bottom: 12px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            -webkit-appearance: none;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .button-container button {
+            width: 100%;
+            min-height: 44px;
+        }
+
+        .todo-item, .daily-task {
+            background: #fff;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+            user-select: none;
+            min-height: 54px; /* 统一最小高度 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .todo-item:hover, .daily-task:hover {
+            background-color: #e0e0e0;
+        }
+
+        .todo-item button, .daily-task button {
+            background-color: #ff4747;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%); /* 垂直居中 */
+            min-height: 36px;
+            min-width: 60px;
+        }
+
+        .todo-item button:hover, .daily-task button:hover {
+            background-color: #ff3333;
+        }
+
+        .date-group h3 {
+            font-size: 14px;
+            color: #777;
+            margin: 15px 0 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        @media (max-width: 767px) {
+            .todo-item button, .daily-task button {
+                display: inline-block;
+                position: static;
+                margin-top: 10px;
+                width: 100%;
+                transform: none; /* 移动端不需要垂直居中 */
+                top: auto;
+            }
+            
+            .todo-item, .daily-task {
+                padding-bottom: 50px !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .todo-item:hover button, .daily-task:hover button {
+                display: inline-block;
+            }
+        }
+
+        .date-group {
+            margin-bottom: 20px;
+        }
+
+        .todo-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .add-todo, .add-daily-task {
+            margin-bottom: 25px;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+            opacity: 0.7;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .input-row input {
+            flex: 1;
+            min-width: 45%;
+        }
+
+        @media (max-width: 480px) {
+            .input-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .input-row input {
+                width: 100%;
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 767px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+        
+        .todo-item:active, .daily-task:active {
+            background-color: #d0d0d0;
+        }
+
+        /* 自定义确认对话框样式 */
+        .confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .confirm-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-dialog {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .confirm-overlay.active .confirm-dialog {
+            transform: translateY(0);
+        }
+
+        /* 简约的二维警告图标 */
+        .confirm-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-icon::before {
+            content: "";
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #ff6b6b;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        .confirm-icon::after {
+            content: "!";
+            position: absolute;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b6b;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .confirm-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            flex: 1;
+        }
+
+        .confirm-btn.cancel {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .confirm-btn.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* 修改：确定按钮使用与添加按钮相同的颜色 */
+        .confirm-btn.confirm {
+            background-color: #7ec5ba;
+            color: white;
+            box-shadow: 0 2px 6px rgba(126, 197, 186, 0.3);
+        }
+
+        .confirm-btn.confirm:hover {
+            background-color: #6fbf9d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(126, 197, 186, 0.4);
+        }
+
+        .confirm-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .confirm-dialog {
+                padding: 25px 20px;
+                margin: 20px;
+            }
+            
+            .confirm-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 15px;
+            }
+            
+            .confirm-icon::before {
+                width: 50px;
+                height: 50px;
+                border-width: 3px;
+            }
+            
+            .confirm-icon::after {
+                font-size: 24px;
+                height: 30px;
+            }
+            
+            .confirm-title {
+                font-size: 20px;
+            }
+            
+            .confirm-message {
+                font-size: 15px;
+                margin-bottom: 25px;
+            }
+            
+            .confirm-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .confirm-btn {
+                padding: 15px;
+                width: 100%;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); }
+            to { transform: translateY(0); }
+        }
+
+        .confirm-dialog {
+            animation: slideUp 0.3s ease;
+        }
+
+        /* 任务时间样式 */
+        .task-time {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 修复：统一任务文字颜色 */
+        .todo-item > div > span,
+        .daily-task {
+            color: #333; /* 统一文字颜色 */
+        }
+        
+        .todo-item.completed > div > span,
+        .daily-task.completed {
+            color: #888; /* 完成状态文字颜色 */
+        }
+        
+        /* 归档面板样式 - 与主界面统一 */
+        .archive-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .archive-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .archive-panel {
+            background-color: white;
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 70vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .archive-overlay.active .archive-panel {
+            transform: translateY(0);
+        }
+        
+        .archive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .archive-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .close-archive-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+            line-height: 1;
+        }
+        
+        .close-archive-btn:hover {
+            color: #333;
+        }
+        
+        .archive-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .archive-date-group {
+            margin-bottom: 25px;
+        }
+        
+        .archive-date-title {
+            font-size: 14px;
+            color: #777;
+            margin: 15px 0 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .archive-task {
+            background: #fff;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            user-select: none;
+            min-height: 54px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 4px solid #7ec5ba;
+        }
+        
+        .archive-task-content {
+            color: #333;
+            font-size: 14.5px;
+            line-height: 1.4;
+        }
+        
+        .archive-task-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            display: block;
+        }
+        
+        /* 与主界面统一：无时间的任务不显示时间行 */
+        .archive-task.no-time .archive-task-content {
+            color: #333;
+        }
+        
+        /* 归档中已完成的任务样式 */
+        .archive-task.completed .archive-task-content {
+            text-decoration: line-through;
+            color: #888;
+            opacity: 0.7;
+        }
+        
+        .archive-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .clear-archive-btn {
+            padding: 10px 20px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .clear-archive-btn:hover {
+            background-color: #ff5252;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 767px) {
+            .archive-panel {
+                padding: 20px;
+                margin: 15px;
+                max-height: 75vh;
+            }
+            
+            .archive-title {
+                font-size: 20px;
+            }
+            
+            .archive-task {
+                padding: 15px;
+                margin: 8px 0;
+            }
+        }
+        
+        /* 滚动条样式 */
+        .archive-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .archive-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .archive-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            background-clip: padding-box;
+        }
+        
+        .archive-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+
+<h1 id="greeting"></h1>
+
+<!-- 菜单容器 -->
+<div class="menu-container">
+    <button class="menu-btn" onclick="toggleMenu()">菜单</button>
+    <div class="menu-dropdown" id="menuDropdown">
+        <button class="menu-item" onclick="changeBackground()">
+            <span class="menu-icon">
+                <div class="icon-bg"></div>
+            </span>
+            更换背景
+        </button>
+        <button class="menu-item" onclick="showArchive()">
+            <span class="menu-icon">
+                <div class="icon-archive"></div>
+            </span>
+            查看归档
+        </button>
+    </div>
+</div>
+
+<!-- 归档面板 -->
+<div class="archive-overlay" id="archiveOverlay">
+    <div class="archive-panel">
+        <div class="archive-header">
+            <h2 class="archive-title">已归档的任务</h2>
+            <button class="close-archive-btn" onclick="hideArchive()">×</button>
+        </div>
+        
+        <div class="archive-content" id="archiveContent">
+            <!-- 归档内容将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="archive-actions">
+            <button class="clear-archive-btn" onclick="clearArchive()">清空归档</button>
+        </div>
+    </div>
+</div>
+
+<!-- 自定义确认对话框 -->
+<div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-dialog">
+        <div class="confirm-icon"></div>
+        <div class="confirm-title" id="confirmTitle">确认操作</div>
+        <div class="confirm-message" id="confirmMessage">确定要执行此操作吗？</div>
+        <div class="confirm-buttons">
+            <button class="confirm-btn cancel" onclick="hideConfirm()">取消</button>
+            <button class="confirm-btn confirm" onclick="confirmAction()">确定</button>
+        </div>
+    </div>
+</div>
+
+<div class="background" id="background"></div>
+
+<input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="setBackgroundImage(event)">
+
+<div class="task-wrapper">
+    <div class="container">
+        <div class="left-container">
+            <h2>普通任务</h2>
+            <div class="add-todo">
+                <div class="input-row">
+                    <input type="date" id="todoDate" value="" />
+                    <input type="text" id="todoInput" placeholder="添加待办事项" />
+                </div>
+                <div class="input-row">
+                    <input type="time" id="todoStartTime" />
+                    <input type="time" id="todoEndTime" />
+                </div>
+                <div class="button-container">
+                    <button class="add-btn" onclick="addTodo()">添加</button>
+                </div>
+            </div>
+
+            <!-- 固定高度的滚动容器 -->
+            <div class="task-list-container">
+                <div id="todoList"></div>
+            </div>
+        </div>
+
+        <div class="right-container">
+            <h2>日常任务</h2>
+            <div class="add-daily-task">
+                <input type="text" id="dailyTaskInput" placeholder="输入日常任务" />
+                <div class="input-row">
+                    <input type="time" id="dailyTaskStartTime" />
+                    <input type="time" id="dailyTaskEndTime" />
+                </div>
+                <div class="button-container">
+                    <button class="set-daily-btn" onclick="setDailyTask()">设置日常任务</button>
+                </div>
+            </div>
+            
+            <!-- 固定高度的滚动容器 -->
+            <div class="task-list-container">
+                <div id="dailyTaskList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // 初始化数据
+    let todoData = JSON.parse(localStorage.getItem('todoData')) || [];
+    let dailyTaskData = JSON.parse(localStorage.getItem('dailyTaskData')) || [];
+    let archivedTodos = JSON.parse(localStorage.getItem('archivedTodos')) || [];
+    
+    // 0点重置相关的变量
+    let lastResetDate = localStorage.getItem('lastResetDate') || null;
+    let currentDate = new Date().toDateString();
+    
+    // 菜单状态
+    let isMenuOpen = false;
+
+    // 数据初始化函数
+    function initializeData() {
+        // 检查是否需要0点重置日常任务
+        checkAndResetDailyTasks();
+        
+        // 添加完成状态到现有数据（兼容旧数据）
+        dailyTaskData = dailyTaskData.map(task => {
+            if (task.completed === undefined) {
+                task.completed = false;
+            }
+            // 确保每个日常任务都有唯一的ID
+            if (!task.id) {
+                task.id = new Date().getTime() + Math.random();
+            }
+            return task;
+        });
+        
+        // 对日常任务进行排序
+        sortDailyTaskData();
+        
+        // 保存更新后的数据
+        localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+        
+        // 对普通任务进行排序
+        sortTodoData();
+    }
+
+    // 检查并重置日常任务完成状态
+    function checkAndResetDailyTasks() {
+        // 如果是新的一天（当前日期与上次重置日期不同）
+        if (lastResetDate !== currentDate) {
+            // 检查当前时间是否在0点之后（凌晨）
+            const now = new Date();
+            const currentHour = now.getHours();
+            
+            // 只有在0点-6点之间访问页面时才自动重置
+            if (currentHour >= 0 && currentHour < 6) {
+                // 重置所有日常任务的完成状态
+                dailyTaskData.forEach(task => {
+                    task.completed = false;
+                });
+                
+                // 更新最后重置日期
+                lastResetDate = currentDate;
+                localStorage.setItem('lastResetDate', currentDate);
+                localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+                
+                console.log('日常任务已在0点自动重置');
+            }
+        }
+    }
+
+    // 设置默认日期为今天
+    document.getElementById("todoDate").value = new Date().toISOString().split('T')[0];
+
+    // 自定义确认对话框函数
+    function showConfirm(title, message, callback) {
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        confirmCallback = callback;
+        
+        const dialog = document.getElementById('confirmDialog');
+        dialog.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideConfirm() {
+        const dialog = document.getElementById('confirmDialog');
+        dialog.classList.remove('active');
+        document.body.style.overflow = '';
+        confirmCallback = null;
+        deleteDailyTaskData = null;
+        deleteDailyTaskDiv = null;
+        deleteTodoId = null;
+    }
+
+    function confirmAction() {
+        if (confirmCallback) {
+            confirmCallback();
+        }
+        hideConfirm();
+    }
+
+    // 根据时间获取问候语
+    function getGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        
+        let greeting = "";
+        
+        if (hour >= 23 || hour < 4) {
+            greeting = "晚安，品言！";
+        } else if (hour < 6) {
+            greeting = "凌晨好，品言！";
+        } else if (hour < 9) {
+            greeting = "早上好，品言！";
+        } else if (hour < 12) {
+            greeting = "上午好，品言！";
+        } else if (hour < 14) {
+            greeting = "中午好，品言！";
+        } else if (hour < 18) {
+            greeting = "下午好，品言！";
+        } else {
+            greeting = "晚上好，品言！";
+        }
+        
+        return greeting;
+    }
+
+    function updateGreeting() {
+        const greetingElement = document.getElementById('greeting');
+        if (greetingElement) {
+            greetingElement.textContent = getGreeting();
+            
+            if (isMobile) {
+                const length = getGreeting().length;
+                if (length > 6) {
+                    greetingElement.style.fontSize = '26px';
+                }
+            }
+        }
+    }
+
+    function getColorBrightness(rgbStr) {
+        if (!rgbStr || rgbStr === 'transparent' || rgbStr === 'rgba(0, 0, 0, 0)') {
+            return 255;
+        }
+        
+        const rgbMatch = rgbStr.match(/\d+/g);
+        if (!rgbMatch) return 255;
+        
+        const rgb = rgbMatch.map(Number);
+        return (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+    }
+
+    function calculateHoverColor(rgbStr) {
+        if (!rgbStr || rgbStr === 'transparent' || rgbStr === 'rgba(0, 0, 0, 0)') {
+            return '#6fbf9d';
+        }
+        
+        const rgbMatch = rgbStr.match(/\d+/g);
+        if (!rgbMatch || rgbMatch.length < 3) return '#6fbf9d';
+        
+        const rgb = rgbMatch.map(Number);
+        const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+        
+        if (brightness > 180) {
+            return `rgb(${Math.max(0, rgb[0] - 30)}, ${Math.max(0, rgb[1] - 30)}, ${Math.max(0, rgb[2] - 30)})`;
+        } else if (brightness > 128) {
+            return `rgb(${Math.max(0, rgb[0] - 20)}, ${Math.max(0, rgb[1] - 20)}, ${Math.max(0, rgb[2] - 20)})`;
+        } else if (brightness > 60) {
+            return `rgb(${Math.max(0, rgb[0] - 15)}, ${Math.max(0, rgb[1] - 15)}, ${Math.max(0, rgb[2] - 15)})`;
+        } else {
+            return `rgb(${Math.min(255, rgb[0] + 20)}, ${Math.min(255, rgb[1] + 20)}, ${Math.min(255, rgb[2] + 20)})`;
+        }
+    }
+
+    function updateButtonStyles(buttons, baseColor) {
+        buttons.forEach(button => {
+            if (!baseColor || baseColor === 'rgb(0, 0, 0)') {
+                baseColor = '#7ec5ba';
+            }
+            
+            button.style.backgroundColor = baseColor;
+            
+            const brightness = getColorBrightness(baseColor);
+            
+            if (brightness > 128) {
+                button.style.setProperty('--hover-shadow', 'var(--hover-shadow-light)');
+            } else {
+                button.style.setProperty('--hover-shadow', 'var(--hover-shadow-dark)');
+            }
+            
+            const hoverColor = calculateHoverColor(baseColor);
+            button.style.setProperty('--hover-color', hoverColor);
+            
+            // 同时更新确认对话框的确定按钮
+            const confirmBtn = document.querySelector('.confirm-btn.confirm');
+            if (confirmBtn) {
+                confirmBtn.style.backgroundColor = baseColor;
+                confirmBtn.style.setProperty('--hover-color', hoverColor);
+            }
+            
+            if (isMobile) {
+                button.ontouchstart = function(e) {
+                    this.style.backgroundColor = hoverColor;
+                    e.preventDefault();
+                };
+                
+                button.ontouchend = function() {
+                    this.style.backgroundColor = baseColor;
+                };
+            } else {
+                button.onmouseenter = function() {
+                    this.style.backgroundColor = hoverColor;
+                };
+                
+                button.onmouseleave = function() {
+                    this.style.backgroundColor = baseColor;
+                };
+            }
+        });
+    }
+
+    function adjustButtonColor(imageSrc) {
+        const img = new Image();
+        img.src = imageSrc;
+
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1;
+            canvas.height = 1;
+            ctx.drawImage(img, 0, 0, 1, 1);
+
+            const pixel = ctx.getImageData(0, 0, 1, 1).data;
+            const baseColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+
+            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+            updateButtonStyles(buttons, baseColor);
+        };
+        
+        img.onerror = function() {
+            const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+            const defaultColor = '#7ec5ba';
+            updateButtonStyles(buttons, defaultColor);
+        };
+    }
+
+    function loadBackground() {
+        const savedBackground = localStorage.getItem('backgroundImage');
+        if (savedBackground) {
+            const background = document.getElementById('background');
+            background.style.backgroundImage = `url(${savedBackground})`;
+            adjustButtonColor(savedBackground);
+        }
+    }
+
+    function saveBackground(imageSrc) {
+        localStorage.setItem('backgroundImage', imageSrc);
+    }
+
+    // 日常任务排序函数
+    function sortDailyTaskData() {
+        dailyTaskData.sort((a, b) => {
+            // 首先，未完成的排在前面
+            if (!a.completed && b.completed) return -1;
+            if (a.completed && !b.completed) return 1;
+            
+            // 都有时间时，按起始时间排序
+            const aHasTime = a.startTime && a.endTime;
+            const bHasTime = b.startTime && b.endTime;
+            
+            if (aHasTime && !bHasTime) return -1;
+            if (!aHasTime && bHasTime) return 1;
+            
+            // 都有时间时按起始时间排序
+            if (aHasTime && bHasTime) {
+                return a.startTime.localeCompare(b.startTime);
+            }
+            
+            // 都没有时间时按添加顺序（ID）排序
+            return a.id - b.id;
+        });
+    }
+
+    // 普通任务排序函数
+    function sortTodoData() {
+        todoData.sort((a, b) => {
+            // 首先按日期排序
+            const dateCompare = a.date.localeCompare(b.date);
+            if (dateCompare !== 0) return dateCompare;
+            
+            // 同一天内，未完成的排在前面
+            if (!a.completed && b.completed) return -1;
+            if (a.completed && !b.completed) return 1;
+            
+            // 同一天内，有时间的排在前面
+            const aHasTime = a.startTime && a.endTime;
+            const bHasTime = b.startTime && b.endTime;
+            
+            if (aHasTime && !bHasTime) return -1;
+            if (!aHasTime && bHasTime) return 1;
+            
+            // 都有时间时按起始时间排序
+            if (aHasTime && bHasTime) {
+                return a.startTime.localeCompare(b.startTime);
+            }
+            
+            // 都没有时间时按添加顺序（ID）排序
+            return a.id - b.id;
+        });
+    }
+
+    // 添加示例任务（仅第一次运行时添加）
+    function addSampleTasks() {
+        if (todoData.length === 0 && dailyTaskData.length === 0 && archivedTodos.length === 0) {
+            // 添加几个普通任务示例
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            
+            // 今天的有时间任务
+            todoData.push({
+                task: '完成项目报告',
+                date: today,
+                startTime: '09:00',
+                endTime: '11:00',
+                id: Date.now() + 1,
+                completed: false
+            });
+            
+            // 今天的无时间任务
+            todoData.push({
+                task: '阅读技术文档',
+                date: today,
+                startTime: '',
+                endTime: '',
+                id: Date.now() + 2,
+                completed: false
+            });
+            
+            // 明天的任务
+            todoData.push({
+                task: '团队会议',
+                date: tomorrow,
+                startTime: '14:00',
+                endTime: '16:00',
+                id: Date.now() + 3,
+                completed: false
+            });
+            
+            // 添加日常任务示例
+            dailyTaskData.push({
+                task: '晨间锻炼',
+                startTime: '07:00',
+                endTime: '08:00',
+                completed: false,
+                id: Date.now() + 4
+            });
+            
+            dailyTaskData.push({
+                task: '学习新知识',
+                startTime: '',
+                endTime: '',
+                completed: false,
+                id: Date.now() + 5
+            });
+            
+            // 添加归档任务示例（模拟昨天完成的任务）
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            archivedTodos.push({
+                task: '整理工作台',
+                date: yesterday,
+                startTime: '10:00',
+                endTime: '11:30',
+                id: Date.now() + 6,
+                completed: true,
+                archivedDate: yesterday,
+                archivedTime: '11:45'
+            });
+            
+            archivedTodos.push({
+                task: '购买办公用品',
+                date: yesterday,
+                startTime: '',
+                endTime: '',
+                id: Date.now() + 7,
+                completed: true,
+                archivedDate: yesterday,
+                archivedTime: '16:20'
+            });
+            
+            // 保存到本地存储
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+            localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
+            
+            console.log('示例任务已添加');
+        }
+    }
+
+    window.onload = function() {
+        updateGreeting();
+        loadBackground();
+        initializeData(); // 初始化数据，包括排序和0点重置检查
+        
+        // 添加示例任务（仅第一次运行）
+        addSampleTasks();
+        
+        // 显示日常任务
+        renderDailyTasks();
+        renderTodos();
+        
+        const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .confirm-btn.confirm');
+        const defaultColor = '#7ec5ba';
+        updateButtonStyles(buttons, defaultColor);
+        
+        if (isMobile) {
+            document.querySelectorAll('.todo-item, .daily-task').forEach(item => {
+                item.ontouchstart = function() {
+                    this.style.backgroundColor = '#e0e0e0';
+                };
+                
+                item.ontouchend = function() {
+                    this.style.backgroundColor = '#fff';
+                };
+            });
+        }
+        
+        // 每小时检查一次时间，用于更新问候语
+        setInterval(updateGreeting, 60 * 60 * 1000);
+        
+        // 每分钟检查一次是否到了0点需要重置日常任务
+        setInterval(checkMidnightReset, 60 * 1000);
+    };
+
+    // 检查是否到达0点需要重置日常任务
+    function checkMidnightReset() {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        
+        // 在0点整重置（允许前后几分钟的误差）
+        if (currentHour === 0 && currentMinute < 5) {
+            const today = now.toDateString();
+            if (lastResetDate !== today) {
+                // 重置所有日常任务的完成状态
+                dailyTaskData.forEach(task => {
+                    task.completed = false;
+                });
+                
+                // 更新最后重置日期
+                lastResetDate = today;
+                localStorage.setItem('lastResetDate', today);
+                localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+                
+                // 重新渲染日常任务
+                renderDailyTasks();
+                
+                console.log('日常任务已在0点自动重置');
+            }
+        }
+        
+        // 更新当前日期
+        currentDate = now.toDateString();
+    }
+
+    // 菜单功能
+    function toggleMenu() {
+        const menu = document.getElementById('menuDropdown');
+        menu.classList.toggle('active');
+        isMenuOpen = !isMenuOpen;
+    }
+    
+    function closeMenu() {
+        const menu = document.getElementById('menuDropdown');
+        menu.classList.remove('active');
+        isMenuOpen = false;
+    }
+    
+    // 点击页面其他位置关闭菜单
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('menuDropdown');
+        const menuBtn = document.querySelector('.menu-btn');
+        
+        if (isMenuOpen && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+            closeMenu();
+        }
+    });
+    
+    // 按ESC键关闭菜单
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isMenuOpen) {
+            closeMenu();
+        }
+    });
+
+    function setDailyTask() {
+        const dailyTaskInput = document.getElementById('dailyTaskInput').value;
+        const dailyTaskStartTime = document.getElementById('dailyTaskStartTime').value;
+        const dailyTaskEndTime = document.getElementById('dailyTaskEndTime').value;
+
+        if (dailyTaskInput) {
+            const dailyTask = {
+                task: dailyTaskInput,
+                startTime: dailyTaskStartTime || '',
+                endTime: dailyTaskEndTime || '',
+                completed: false,
+                id: new Date().getTime()
+            };
+
+            dailyTaskData.push(dailyTask);
+            
+            // 重新排序
+            sortDailyTaskData();
+            
+            localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+            renderDailyTasks();
+            resetDailyTaskInput();
+            
+            if (isMobile) {
+                document.activeElement.blur();
+            }
+        } else {
+            showConfirm('提示', '请输入日常任务！', function() {
+                // 空回调，只是显示提示
+            });
+        }
+    }
+
+    function renderDailyTasks() {
+        const dailyTaskList = document.getElementById('dailyTaskList');
+        dailyTaskList.innerHTML = '';
+        
+        // 重新排序
+        sortDailyTaskData();
+        
+        dailyTaskData.forEach(dailyTask => {
+            displayDailyTask(dailyTask);
+        });
+    }
+
+    function displayDailyTask(dailyTask) {
+        const dailyTaskList = document.getElementById('dailyTaskList');
+        
+        const dailyTaskDiv = document.createElement('div');
+        dailyTaskDiv.className = 'daily-task';
+        dailyTaskDiv.dataset.id = dailyTask.id;
+        
+        if (dailyTask.completed) {
+            dailyTaskDiv.classList.add('completed');
+        }
+
+        let taskContent = '';
+        if (dailyTask.startTime && dailyTask.endTime) {
+            taskContent = `${dailyTask.task}<br><small class="task-time">${dailyTask.startTime} 到 ${dailyTask.endTime}</small>`;
+        } else {
+            taskContent = dailyTask.task;
+        }
+
+        dailyTaskDiv.innerHTML = taskContent;
+
+        // 添加点击事件
+        if (isMobile) {
+            dailyTaskDiv.ontouchstart = function(e) {
+                if (e.target.tagName !== 'BUTTON') {
+                    toggleDailyTaskComplete(dailyTask.id, this);
+                }
+            };
+        } else {
+            dailyTaskDiv.onclick = function(e) {
+                if (e.target.tagName !== 'BUTTON') {
+                    toggleDailyTaskComplete(dailyTask.id, this);
+                }
+            };
+        }
+
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = '删除';
+        deleteButton.onclick = function(event) {
+            event.stopPropagation();
+            deleteDailyTaskData = dailyTask;
+            deleteDailyTaskDiv = dailyTaskDiv;
+            showConfirm('删除确认', `确定要删除"${dailyTask.task}"这个日常任务吗？`, function() {
+                performDailyTaskDeletion();
+            });
+        };
+        
+        if (isMobile) {
+            deleteButton.ontouchstart = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                deleteDailyTaskData = dailyTask;
+                deleteDailyTaskDiv = dailyTaskDiv;
+                showConfirm('删除确认', `确定要删除"${dailyTask.task}"这个日常任务吗？`, function() {
+                    performDailyTaskDeletion();
+                });
+            };
+        }
+        
+        dailyTaskDiv.appendChild(deleteButton);
+        dailyTaskList.appendChild(dailyTaskDiv);
+    }
+
+    function toggleDailyTaskComplete(taskId, taskDiv) {
+        const task = dailyTaskData.find(t => t.id === taskId);
+        if (task) {
+            task.completed = !task.completed;
+            taskDiv.classList.toggle('completed');
+            
+            // 重新排序
+            sortDailyTaskData();
+            localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+            
+            // 重新渲染以更新排序
+            renderDailyTasks();
+        }
+    }
+
+    function performDailyTaskDeletion() {
+        if (deleteDailyTaskData && deleteDailyTaskDiv) {
+            dailyTaskData = dailyTaskData.filter(task => task.id !== deleteDailyTaskData.id);
+            
+            // 重新排序
+            sortDailyTaskData();
+            
+            localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+            
+            // 重新渲染
+            renderDailyTasks();
+            
+            deleteDailyTaskData = null;
+            deleteDailyTaskDiv = null;
+        }
+    }
+
+    function addTodo() {
+        const todoInput = document.getElementById('todoInput').value;
+        const todoDate = document.getElementById('todoDate').value;
+        const todoStartTime = document.getElementById('todoStartTime').value;
+        const todoEndTime = document.getElementById('todoEndTime').value;
+
+        if (todoInput && todoDate) {
+            const newTodo = {
+                task: todoInput,
+                date: todoDate,
+                startTime: todoStartTime || '',
+                endTime: todoEndTime || '',
+                id: new Date().getTime(),
+                completed: false
+            };
+
+            todoData.push(newTodo);
+            
+            // 重新排序
+            sortTodoData();
+            
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            renderTodos();
+            document.getElementById('todoDate').value = newTodo.date;
+            resetInputFields();
+            
+            if (isMobile) {
+                document.activeElement.blur();
+            }
+        } else {
+            showConfirm('提示', '请输入待办事项和日期！', function() {
+                // 空回调，只是显示提示
+            });
+        }
+    }
+
+    function renderTodos() {
+        // 先排序
+        sortTodoData();
+        
+        const todoList = document.getElementById('todoList');
+        todoList.innerHTML = '';
+
+        let groupedTodos = {};
+
+        todoData.forEach(todo => {
+            if (!groupedTodos[todo.date]) {
+                groupedTodos[todo.date] = [];
+            }
+            groupedTodos[todo.date].push(todo);
+        });
+
+        // 按日期排序
+        const sortedDates = Object.keys(groupedTodos).sort();
+
+        for (const date of sortedDates) {
+            const dateGroup = document.createElement('div');
+            dateGroup.className = 'date-group';
+            const dateLabel = document.createElement('h3');
+            
+            // 格式化日期显示
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            
+            let displayDate = date;
+            if (date === today) {
+                displayDate = '今天';
+            } else if (date === tomorrow) {
+                displayDate = '明天';
+            }
+            
+            dateLabel.innerText = displayDate;
+            dateGroup.appendChild(dateLabel);
+            
+            groupedTodos[date].forEach(todo => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                todoItem.dataset.id = todo.id;
+                
+                if (todo.completed) {
+                    todoItem.classList.add('completed');
+                }
+
+                let timeLabel = '';
+                
+                if (todo.startTime && todo.endTime) {
+                    timeLabel = `<small class="task-time">${todo.startTime} 到 ${todo.endTime}</small>`;
+                }
+                
+                todoItem.innerHTML = `
+                    <div>
+                        <span>${todo.task}</span>
+                        ${timeLabel}
+                    </div>
+                    <button onclick="showTodoDeleteConfirm(${todo.id}, '${todo.task.replace(/'/g, "\\'")}')">删除</button>
+                `;
+                
+                // 添加点击事件
+                if (isMobile) {
+                    todoItem.ontouchstart = function(e) {
+                        if (e.target.tagName !== 'BUTTON') {
+                            toggleTodoComplete(todo.id, this);
+                        }
+                    };
+                } else {
+                    todoItem.onclick = function(e) {
+                        if (e.target.tagName !== 'BUTTON') {
+                            toggleTodoComplete(todo.id, this);
+                        }
+                    };
+                }
+                
+                dateGroup.appendChild(todoItem);
+            });
+            todoList.appendChild(dateGroup);
+        }
+    }
+
+    function toggleTodoComplete(todoId, todoItem) {
+        const todo = todoData.find(t => t.id === todoId);
+        if (todo) {
+            todo.completed = !todo.completed;
+            todoItem.classList.toggle('completed');
+            
+            // 如果任务完成，自动归档
+            if (todo.completed) {
+                archiveTodo(todo);
+            }
+            
+            // 重新排序
+            sortTodoData();
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            
+            // 重新渲染以更新排序
+            renderTodos();
+        }
+    }
+
+    // 归档任务函数
+    function archiveTodo(todo) {
+        const now = new Date();
+        const archivedTask = {
+            ...todo,
+            archivedDate: now.toISOString().split('T')[0], // 归档日期
+            archivedTime: now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false
+            })
+        };
+        
+        // 从todoData中移除已归档的任务
+        todoData = todoData.filter(t => t.id !== todo.id);
+        localStorage.setItem('todoData', JSON.stringify(todoData));
+        
+        archivedTodos.unshift(archivedTask); // 添加到开头（最新的在前）
+        localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
+        
+        // 立即重新渲染主界面的任务列表
+        renderTodos();
+    }
+
+    // 归档功能
+    function showArchive() {
+        closeMenu();
+        renderArchive();
+        document.getElementById('archiveOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function hideArchive() {
+        document.getElementById('archiveOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function renderArchive() {
+        const archiveContent = document.getElementById('archiveContent');
+        archiveContent.innerHTML = '';
+        
+        if (archivedTodos.length === 0) {
+            archiveContent.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">暂无归档的任务</div>';
+            return;
+        }
+        
+        // 按归档日期分组
+        let groupedByDate = {};
+        
+        archivedTodos.forEach(task => {
+            const archiveDate = task.archivedDate || task.date;
+            if (!groupedByDate[archiveDate]) {
+                groupedByDate[archiveDate] = [];
+            }
+            groupedByDate[archiveDate].push(task);
+        });
+        
+        // 按日期倒序排列（最新的在前）
+        const sortedDates = Object.keys(groupedByDate).sort((a, b) => b.localeCompare(a));
+        
+        for (const date of sortedDates) {
+            const dateGroup = document.createElement('div');
+            dateGroup.className = 'archive-date-group';
+            
+            const dateLabel = document.createElement('h3');
+            dateLabel.className = 'archive-date-title';
+            
+            // 格式化日期显示 - 与主界面完全一致
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            
+            let displayDate = date;
+            if (date === today) {
+                displayDate = '今天';
+            } else if (date === yesterday) {
+                displayDate = '昨天';
+            }
+            
+            dateLabel.innerText = displayDate;
+            dateGroup.appendChild(dateLabel);
+            
+            // 按时间排序 - 与主界面逻辑一致
+            groupedByDate[date].sort((a, b) => {
+                const aHasTime = a.startTime && a.endTime;
+                const bHasTime = b.startTime && b.endTime;
+                
+                if (aHasTime && !bHasTime) return -1;
+                if (!aHasTime && bHasTime) return 1;
+                if (aHasTime && bHasTime) {
+                    return a.startTime.localeCompare(b.startTime);
+                }
+                return 0;
+            });
+            
+            groupedByDate[date].forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'archive-task';
+                
+                if (!task.startTime && !task.endTime) {
+                    taskElement.classList.add('no-time');
+                }
+                
+                if (task.completed) {
+                    taskElement.classList.add('completed');
+                }
+                
+                // 与主界面完全一致的显示方式
+                let timeLabel = '';
+                if (task.startTime && task.endTime) {
+                    timeLabel = `<small class="archive-task-time">${task.startTime} 到 ${task.endTime}</small>`;
+                }
+                
+                taskElement.innerHTML = `
+                    <div class="archive-task-content">${task.task}</div>
+                    ${timeLabel}
+                `;
+                
+                dateGroup.appendChild(taskElement);
+            });
+            
+            archiveContent.appendChild(dateGroup);
+        }
+    }
+    
+    // 清空归档
+    function clearArchive() {
+        showConfirm('清空归档', '确定要清空所有归档的任务吗？此操作不可恢复！', function() {
+            archivedTodos = [];
+            localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
+            renderArchive();
+        });
+    }
+
+    function showTodoDeleteConfirm(id, taskName) {
+        deleteTodoId = id;
+        showConfirm('删除确认', `确定要删除"${taskName}"这个任务吗？`, function() {
+            performTodoDeletion();
+        });
+    }
+
+    function performTodoDeletion() {
+        if (deleteTodoId) {
+            todoData = todoData.filter(todo => todo.id !== deleteTodoId);
+            
+            // 重新排序
+            sortTodoData();
+            
+            localStorage.setItem('todoData', JSON.stringify(todoData));
+            renderTodos();
+            deleteTodoId = null;
+        }
+    }
+
+    function resetInputFields() {
+        document.getElementById('todoInput').value = '';
+        document.getElementById('todoStartTime').value = '';
+        document.getElementById('todoEndTime').value = '';
+    }
+
+    function resetDailyTaskInput() {
+        document.getElementById('dailyTaskInput').value = '';
+        document.getElementById('dailyTaskStartTime').value = '';
+        document.getElementById('dailyTaskEndTime').value = '';
+    }
+
+    function changeBackground() {
+        closeMenu();
+        document.getElementById('fileInput').click();
+    }
+
+    function setBackgroundImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const background = document.getElementById('background');
+                background.style.backgroundImage = `url(${e.target.result})`;
+                adjustButtonColor(e.target.result);
+                saveBackground(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // 点击归档面板外部关闭
+    document.getElementById('archiveOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideArchive();
+        }
+    });
+    
+    // 按ESC键关闭归档面板
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const archiveOverlay = document.getElementById('archiveOverlay');
+            if (archiveOverlay.classList.contains('active')) {
+                hideArchive();
+            }
+        }
+    });
+    
+    // 点击对话框外部关闭
+    document.getElementById('confirmDialog').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideConfirm();
+        }
+    });
+    
+    // 按ESC键关闭对话框
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideConfirm();
+        }
+    });
+    
+    // 防止移动设备上的双击缩放
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // 阻止iOS上的橡皮筋效果
+    document.body.addEventListener('touchmove', function(e) {
+        if (e.target.classList.contains('task-list-container') || 
+            e.target.closest('.task-list-container')) {
+            return;
+        }
+        
+        const scrollable = document.querySelector('.task-wrapper');
+        if (scrollable.scrollTop === 0) {
+            scrollable.scrollTop = 1;
+        } else if (scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight) {
+            scrollable.scrollTop = scrollable.scrollTop - 1;
+        }
+    }, { passive: false });
+</script>
+</body>
+</html>
