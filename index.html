@@ -1348,190 +1348,27 @@ border: 1px solid rgba(255, 255, 255, 0.3);
         document.getElementById('nameSetupOverlay').classList.add('hidden');
         updateGreeting();
           }
-// ========== 农历计算系统（2020-2030） ==========
-class LunarCalendar {
-    constructor() {
-        // 农历数据表（2020-2030年）
-        this.lunarInfo = [
-            0x04bd8, // 2020
-            0x04ae0, // 2021
-            0x0a570, // 2022
-            0x054d5, // 2023
-            0x0d260, // 2024
-            0x0d950, // 2025
-            0x16554, // 2026
-            0x056a0, // 2027
-            0x09ad0, // 2028
-            0x055d2, // 2029
-            0x04ae0  // 2030
-        ];
+
+    // 节日问候判断
+    function getFestivalGreeting() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
         
-        // 生肖
-        this.zodiacs = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
-        
-        // 天干
-        this.heavenlyStems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-        
-        // 地支
-        this.earthlyBranches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-        
-        // 农历月份
-        this.monthNames = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','腊月'];
-        
-        // 农历日期
-        this.dayNames = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
-                        '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
-                        '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
-        
-        // 农历节日（月-日）
-        this.lunarFestivals = {
-            '1-1': '春节',
-            '1-15': '元宵节',
-            '5-5': '端午节',
-            '8-15': '中秋节',
-            '9-9': '重阳节',
-            '12-8': '腊八节',
-            '12-23': '小年'
-        };
-    }
-    
-    // 计算农历年
-    getLunarYear(year) {
-        return year - 2020 + 1; // 从2020年开始索引
-    }
-    
-    // 计算生肖
-    getZodiac(year) {
-        return this.zodiacs[(year - 2020) % 12];
-    }
-    
-    // 计算农历日期
-    getLunarDate(solarDate = new Date()) {
-        const year = solarDate.getFullYear();
-        const month = solarDate.getMonth() + 1;
-        const day = solarDate.getDate();
-        
-        // 如果年份不在2020-2030范围内，返回默认值
-        if (year < 2020 || year > 2030) {
-            return {
-                year: year,
-                month: '正月',
-                day: '初一',
-                isLeap: false,
-                zodiac: this.getZodiac(year),
-                toString: function() {
-                    return `${this.year}年${this.month}${this.day}`;
-                }
-            };
+        // 4月3日显示生日快乐
+        if (month === 4 && day === 3) {
+            return "生日快乐";
         }
         
-        // 计算农历
-        const lunarYear = year;
-        const lunarMonth = this.calcLunarMonth(year, month, day);
-        const lunarDay = this.calcLunarDay(year, month, day);
+        // 其他节日可以在这里添加
+        // 例如：
+        // if (month === 1 && day === 1) return "元旦快乐";
+        // if (month === 2 && day === 14) return "情人节快乐";
+        // if (month === 10 && day === 1) return "国庆节快乐";
         
-        return {
-            year: lunarYear,
-            month: this.monthNames[lunarMonth - 1] || '正月',
-            day: this.dayNames[lunarDay - 1] || '初一',
-            isLeap: false,
-            zodiac: this.getZodiac(year),
-            toString: function() {
-                return `${this.year}年${this.month}${this.day}`;
-            }
-        };
+        return null;
     }
-    
-    // 简化计算农历月份
-    calcLunarMonth(year, month, day) {
-        // 这里使用简化算法，实际农历算法很复杂
-        // 返回近似的农历月份
-        const baseMonth = month;
-        return Math.min(Math.max(baseMonth, 1), 12);
-    }
-    
-    // 简化计算农历日期
-    calcLunarDay(year, month, day) {
-        // 返回近似的农历日期
-        return Math.min(Math.max(day, 1), 30);
-    }
-    
-    // 获取农历节日
-    getLunarFestival(lunarMonth, lunarDay) {
-        const key = `${lunarMonth}-${lunarDay}`;
-        return this.lunarFestivals[key] || null;
-    }
-}
 
-// 创建农历实例
-const lunarCalendar = new LunarCalendar();
- // ========== 节日问候判断（支持公历和农历） ==========
-function getFestivalGreeting() {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear();
-    
-    // 1. 检查生日（优先级最高）
-    if ((month === 4 && day === 3) || (month === 2 && day === 19)) {
-        return "生日快乐";
-    }
-    
-    // 2. 公历节日数据库
-    const solarFestivals = {
-        '1-1': '元旦快乐',
-        '2-14': '情人节快乐',
-        '3-8': '妇女节快乐',
-        '4-1': '愚人节快乐',
-        '5-1': '劳动节快乐',
-        '6-1': '儿童节快乐',
-        '9-10': '教师节快乐',
-        '10-1': '国庆节快乐',
-        '12-24': '平安夜快乐',
-        '12-25': '圣诞节快乐'
-    };
-    
-    const solarKey = `${month}-${day}`;
-    if (solarFestivals[solarKey]) {
-        return solarFestivals[solarKey];
-    }
-    
-    // 3. 检查农历节日（仅在2020-2030年范围内）
-    if (year >= 2020 && year <= 2030) {
-        const lunarDate = lunarCalendar.getLunarDate(now);
-        
-        // 获取农历月份和日期的数字
-        const lunarMonthNum = this.getLunarMonthNumber(lunarDate.month);
-        const lunarDayNum = this.getLunarDayNumber(lunarDate.day);
-        
-        if (lunarMonthNum && lunarDayNum) {
-            const lunarFestival = lunarCalendar.getLunarFestival(lunarMonthNum, lunarDayNum);
-            if (lunarFestival) {
-                return `${lunarFestival}快乐`;
-            }
-        }
-    }
-    
-    return null;
-}
-
-// 辅助函数：农历月份转数字
-function getLunarMonthNumber(lunarMonthStr) {
-    const monthMap = {
-        '正月': 1, '二月': 2, '三月': 3, '四月': 4, '五月': 5, '六月': 6,
-        '七月': 7, '八月': 8, '九月': 9, '十月': 10, '冬月': 11, '腊月': 12
-    };
-    return monthMap[lunarMonthStr] || null;
-}
-
-// 辅助函数：农历日期转数字
-function getLunarDayNumber(lunarDayStr) {
-    const dayMap = {};
-    for (let i = 1; i <= 30; i++) {
-        dayMap[lunarCalendar.dayNames[i-1]] = i;
-    }
-    return dayMap[lunarDayStr] || null;
-}
     // 根据时间获取问候语（修改版，加入节日判断）
     function getGreeting() {
         const festivalGreeting = getFestivalGreeting();
@@ -1844,18 +1681,42 @@ function formatDateForDisplay(dateStr) {
         };
     }
 
-    function loadBackground() {
-        const savedBackground = localStorage.getItem('backgroundImage');
-        if (savedBackground) {
+   function loadBackground() {
+    const savedBackground = localStorage.getItem('backgroundImage');
+    console.log('加载背景:', savedBackground ? '有数据' : '无数据');
+    
+    if (savedBackground && savedBackground.startsWith('data:image/')) {
+        try {
             const background = document.getElementById('background');
-            background.style.backgroundImage = `url(${savedBackground})`;
+            if (background) {
+                // 立即设置背景
+                background.style.backgroundImage = `url(${savedBackground})`;
+                console.log('背景设置成功');
+            }
             adjustButtonColor(savedBackground);
+        } catch (error) {
+            console.error('背景设置失败:', error);
+            // 清除损坏的数据
+            localStorage.removeItem('backgroundImage');
         }
+    } else if (savedBackground) {
+        // 如果数据格式不对，清除它
+        console.warn('背景数据格式错误，已清除');
+        localStorage.removeItem('backgroundImage');
     }
+}
 
-    function saveBackground(imageSrc) {
+  function saveBackground(imageSrc) {
+    if (!imageSrc) return;
+    
+    // 确保是有效的base64图片数据
+    if (imageSrc.startsWith('data:image/')) {
         localStorage.setItem('backgroundImage', imageSrc);
+        console.log('背景保存成功');
+    } else {
+        console.warn('无法保存非base64格式的背景');
     }
+}
 
     // 日常任务排序函数
     function sortDailyTaskData() {
@@ -2010,33 +1871,36 @@ function formatDateForDisplay(dateStr) {
         }
     }
 
-    window.onload = function() {
-        checkUserName();
-        loadBackground();
-        initializeData(); // 初始化数据，包括排序和0点重置检查
-        
-        // 添加示例任务（仅第一次运行）
-        addSampleTasks();
-        
-        // 显示日常任务
-        renderDailyTasks();
-        renderTodos();
-        
-        const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .add-toggle-btn, .confirm-btn.confirm');
-        const defaultColor = '#7ec5ba';
-        updateButtonStyles(buttons, defaultColor);
-        
-        // 设置浮窗的点击外部关闭事件
-        setupFormOverlayEvents();
-        
-        // 每小时检查一次时间，用于更新问候语
-        setInterval(updateGreeting, 60 * 60 * 1000);
-        
-        // 每分钟检查一次是否到了0点需要重置日常任务和归档任务
-        setInterval(checkMidnightReset, 60 * 1000);
-        
-        
-    };
+ window.onload = function() {
+    // 1. 先加载背景（最重要）
+    loadBackground();
+    
+    // 2. 检查用户名
+    checkUserName();
+    
+    // 3. 初始化数据
+    initializeData();
+    
+    // 4. 添加示例任务（仅第一次）
+    addSampleTasks();
+    
+    // 5. 渲染任务
+    renderDailyTasks();
+    renderTodos();
+    
+    // 6. 设置按钮样式
+    const buttons = document.querySelectorAll('.menu-btn, .add-btn, .set-daily-btn, .add-toggle-btn, .confirm-btn.confirm');
+    const defaultColor = '#7ec5ba';
+    updateButtonStyles(buttons, defaultColor);
+    
+    // 7. 设置浮窗事件
+    setupFormOverlayEvents();
+    
+    // 8. 设置定时器
+    setInterval(updateGreeting, 60 * 60 * 1000);
+    setInterval(checkMidnightReset, 60 * 1000);
+    setInterval(updateDateDisplay, 60 * 60 * 1000);
+};
 
     // 检查是否到达0点需要重置日常任务和归档任务
     function checkMidnightReset() {
@@ -2579,19 +2443,33 @@ function formatDateForDisplay(dateStr) {
         document.getElementById('fileInput').click();
     }
 
-    function setBackgroundImage(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const background = document.getElementById('background');
+   function setBackgroundImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const background = document.getElementById('background');
+            if (background) {
+                // 1. 先显示图片
                 background.style.backgroundImage = `url(${e.target.result})`;
+                console.log('背景已显示');
+                
+                // 2. 调整按钮颜色
                 adjustButtonColor(e.target.result);
+                
+                // 3. 保存到本地存储
                 saveBackground(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
+            }
+        };
+        
+        reader.onerror = function(e) {
+            console.error('图片读取失败:', e.target.error);
+        };
+        
+        reader.readAsDataURL(file);
     }
+}
     
     // 点击归档面板外部关闭
     document.getElementById('archiveOverlay').addEventListener('click', function(e) {
@@ -2626,4 +2504,3 @@ function formatDateForDisplay(dateStr) {
 </script>
 </body>
 </html>
-
