@@ -1402,26 +1402,38 @@ border: 1px solid rgba(255, 255, 255, 0.3);
             greetingElement.textContent = getGreeting();
         }
     }
-    // 格式化日期显示（用于普通任务板块）
-    function formatDateForDisplay(dateStr) {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        
-        const date = new Date(dateStr);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        
-        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-        const weekday = weekdays[date.getDay()];
-        
-        // 如果是今年，不显示年份
-        if (year === currentYear) {
-            return `${month}月${day}日 ${weekday}`;
-        } else {
-            return `${year}年${month}月${day}日 ${weekday}`;
-        }
+      // 格式化日期显示（用于普通任务板块）
+function formatDateForDisplay(dateStr) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const today = now.toISOString().split('T')[0];
+    const tomorrow = new Date(now.getTime() + 86400000).toISOString().split('T')[0];
+    
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const weekday = weekdays[date.getDay()];
+    
+    // 检查是否为今天
+    if (dateStr === today) {
+        return `今天 ${weekday}`;
     }
+    
+    // 检查是否为明天
+    if (dateStr === tomorrow) {
+        return `明天 ${weekday}`;
+    }
+    
+    // 如果是今年，不显示年份
+    if (year === currentYear) {
+        return `${month}月${day}日 ${weekday}`;
+    } else {
+        return `${year}年${month}月${day}日 ${weekday}`;
+    }
+}
 
     // 数据初始化函数
     function initializeData() {
