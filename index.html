@@ -1304,7 +1304,6 @@ border: 1px solid rgba(255, 255, 255, 0.3);
         </div>
     </div>
 </div>
-
 <script>
     // 全局变量
     let userName = localStorage.getItem('userName') || '';
@@ -1464,100 +1463,110 @@ function formatDateForDisplay(dateStr) {
     }
 
     // 检查并重置日常任务完成状态
-    function checkAndResetDailyTasks() {
-        // 如果是新的一天（当前日期与上次重置日期不同）
-        if (lastResetDate !== currentDate) {
-            // 检查当前时间是否在0点之后（凌晨）
-            const now = new Date();
-            const currentHour = now.getHours();
-            
-            // 只有在0点-6点之间访问页面时才自动重置
-            if (currentHour >= 0 && currentHour < 6) {
-                // 重置所有日常任务的完成状态
-                dailyTaskData.forEach(task => {
-                    task.completed = false;
-                });
-                
-                // 更新最后重置日期
-                lastResetDate = currentDate;
-                localStorage.setItem('lastResetDate', currentDate);
-                localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
-                
-                console.log('日常任务已在0点自动重置');
-            }
-        }
+   function checkAndResetDailyTasks() {
+    const now = new Date();
+    const today = now.toDateString();
+    
+    // 修改：只要是新的一天就重置（无论何时访问）
+    if (lastResetDate !== today) {
+        console.log(`新的一天：${today}，重置日常任务`);
+        
+        // 重置所有日常任务的完成状态
+        dailyTaskData.forEach(task => {
+            task.completed = false;
+        });
+        
+        // 更新最后重置日期
+        lastResetDate = today;
+        localStorage.setItem('lastResetDate', today);
+        localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+        
+        // 重新渲染
+        renderDailyTasks();
+        
+        console.log('日常任务已重置');
     }
+}
 
-    // 新增：检查并归档昨天的已完成任务
-    function checkAndArchiveOldTasks() {
-        const now = new Date();
-        const today = now.toISOString().split('T')[0];
-        const yesterday = new Date(now.getTime() - 86400000).toISOString().split('T')[0];
+function checkAndArchiveOldTasks() {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    console.log(`检查归档：今天=${today}`);
+    
+    let hasChanges = false;
+    let archivedCount = 0;
+    
+    // 找出所有需要归档的任务（昨天及以前的已完成任务）
+    const tasksToArchive = todoData.filter(todo => {
+        // 必须是已完成的任务
+        if (!todo.completed) return false;
         
-        // 检查是否有昨天完成的任务需要归档
-        let hasChanges = false;
+        // 不能是今天的任务
+        if (todo.date === today) return false;
         
-        // 找出昨天完成但未归档的任务
-        const yesterdayCompletedTodos = todoData.filter(todo => {
-            return todo.date === yesterday && todo.completed && !todo.archived;
-        });
+        // 不能是已经归档过的任务
+        if (todo.archived) return false;
         
-        if (yesterdayCompletedTodos.length > 0) {
-            console.log(`发现 ${yesterdayCompletedTodos.length} 个昨天完成的任务需要归档`);
-            
-            // 归档这些任务
-            yesterdayCompletedTodos.forEach(todo => {
-                archiveTodo(todo, true); // true表示这是昨天的任务
-            });
-            
-            hasChanges = true;
-        }
-        
-        // 找出前天或更早的已完成任务（包括今天的旧任务）
-        const oldCompletedTodos = todoData.filter(todo => {
-            if (!todo.completed) return false;
-            
-            // 如果是今天的任务，不归档
-            if (todo.date === today) return false;
-            
-            // 标记为已归档，避免重复处理
-            return !todo.archived;
-        });
-        
-        if (oldCompletedTodos.length > 0) {
-            console.log(`发现 ${oldCompletedTodos.length} 个旧任务需要归档`);
-            
-            oldCompletedTodos.forEach(todo => {
-                archiveTodo(todo, true);
-            });
-            
-            hasChanges = true;
-        }
-        
-        if (hasChanges) {
-            // 保存更新后的数据
-            localStorage.setItem('todoData', JSON.stringify(todoData));
-            localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
-            
-            // 重新渲染任务列表
-            renderTodos();
-        }
-    }
-
-    // 设置默认日期为今天
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById("todoDateForm").value = new Date().toISOString().split('T')[0];
-        // 检查用户名
-        checkUserName();
-        
-        // 监听用户名输入框的Enter键
-        document.getElementById('userNameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                setUserName();
-            }
-        });
+        return true;
     });
-
+    
+    console.log(`发现 ${tasksToArchive.length} 个任务需要归档`);
+    
+    if (tasksToArchive.length > 0) {
+        // 创建一个新数组，只保留不需要归档的任务
+        const newTodoData = [];
+        const idsToRemove = new Set();
+        
+        // 先收集要移除的ID
+        tasksToArchive.forEach(todo => {
+            idsToRemove.add(todo.id);
+            console.log(`将要归档并删除：${todo.task} (日期: ${todo.date})`);
+        });
+        
+        // 过滤 todoData，移除已归档的任务
+        todoData.forEach(todo => {
+            if (idsToRemove.has(todo.id)) {
+                // 这个任务需要归档，添加到归档列表
+                const archivedTask = {
+                    ...todo,
+                    archived: true, // 确保标记为已归档
+                    archivedDate: now.toISOString().split('T')[0],
+                    archivedTime: now.toLocaleTimeString('zh-CN', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false
+                    })
+                };
+                
+                archivedTodos.unshift(archivedTask);
+                archivedCount++;
+            } else {
+                // 保留这个任务到新数组
+                newTodoData.push(todo);
+            }
+        });
+        
+        // 替换 todoData 数组
+        todoData = newTodoData;
+        hasChanges = true;
+    }
+    
+    if (hasChanges) {
+        // 保存更新后的数据
+        localStorage.setItem('todoData', JSON.stringify(todoData));
+        localStorage.setItem('archivedTodos', JSON.stringify(archivedTodos));
+        
+        // 重新渲染任务列表
+        renderTodos();
+        
+        console.log(`已归档并移除了 ${archivedCount} 个任务`);
+        console.log(`剩余普通任务：${todoData.length} 个`);
+        console.log(`归档任务总数：${archivedTodos.length} 个`);
+    } else {
+        console.log('没有需要归档的任务');
+    }
+}
     // 自定义确认对话框函数
     function showConfirm(title, message, callback) {
         document.getElementById('confirmTitle').textContent = title;
@@ -1902,40 +1911,43 @@ function formatDateForDisplay(dateStr) {
     setInterval(updateDateDisplay, 60 * 60 * 1000);
 };
 
-    // 检查是否到达0点需要重置日常任务和归档任务
-    function checkMidnightReset() {
-        const now = new Date();
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
+function checkMidnightReset() {
+    const now = new Date();
+    const today = now.toDateString();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    console.log(`定时检查：${now.toLocaleTimeString()}, 上次重置: ${lastResetDate}, 今天: ${today}`);
+    
+    // 检查是否需要重置日常任务（只要日期不同就重置）
+    if (lastResetDate !== today) {
+        console.log('检测到新的一天，重置日常任务');
         
-        // 在0点整执行（允许前后几分钟的误差）
-        if (currentHour === 0 && currentMinute < 5) {
-            const today = now.toDateString();
-            if (lastResetDate !== today) {
-                // 1. 重置所有日常任务的完成状态
-                dailyTaskData.forEach(task => {
-                    task.completed = false;
-                });
-                
-                // 2. 归档昨天的已完成任务
-                checkAndArchiveOldTasks();
-                
-                // 更新最后重置日期
-                lastResetDate = today;
-                localStorage.setItem('lastResetDate', today);
-                localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
-                
-                // 重新渲染日常任务
-                renderDailyTasks();
-                
-                console.log('日常任务已在0点自动重置，并检查了任务归档');
-            }
-        }
+        // 重置所有日常任务的完成状态
+        dailyTaskData.forEach(task => {
+            task.completed = false;
+        });
         
-        // 更新当前日期
-        currentDate = now.toDateString();
+        // 更新最后重置日期
+        lastResetDate = today;
+        localStorage.setItem('lastResetDate', today);
+        localStorage.setItem('dailyTaskData', JSON.stringify(dailyTaskData));
+        
+        // 重新渲染日常任务
+        renderDailyTasks();
+        
+        console.log('日常任务已重置');
     }
-
+    
+    // 检查是否需要归档旧任务（每天0点10分执行）
+    if (currentHour === 0 && currentMinute === 10) {
+        console.log('0点10分，检查任务归档');
+        checkAndArchiveOldTasks(); // 调用修复后的函数
+    }
+    
+    // 更新当前日期变量
+    currentDate = today;
+}
     // 菜单功能
     function toggleMenu() {
         const menu = document.getElementById('menuDropdown');
