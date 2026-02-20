@@ -1358,14 +1358,16 @@ border: 1px solid rgba(255, 255, 255, 0.3);
         if (month === 4 && day === 3) {
             return "生日快乐";
         }
-        else (month===2&&day===20){
-            return "十九岁第二天快乐"；
+        if (month === 2&& day === 20) {
+            return "19岁第二天快乐";
         }
+        
+
         // 其他节日可以在这里添加
         // 例如：
-        // if (month === 1 && day === 1) return "元旦快乐";
-        // if (month === 2 && day === 14) return "情人节快乐";
-        // if (month === 10 && day === 1) return "国庆节快乐";
+         if (month === 1 && day === 1) return "元旦快乐";
+         if (month === 2 && day === 14) return "情人节快乐";
+         if (month === 10 && day === 1) return "国庆节快乐";
         
         return null;
     }
@@ -2518,4 +2520,3 @@ function checkMidnightReset() {
 </script>
 </body>
 </html>
-
